@@ -1,0 +1,89 @@
+JS
+import { ethers } from "ethers";
+
+const contractAddress = "0x543E053B527C653Ff07B9F89Fb6dE4233232B660";
+
+const contractABI = [
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_number",
+        "type": "uint256"
+      }
+    ],
+    "name": "updateNumber",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "number",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+];
+
+let provider;
+let signer;
+let contract;
+
+window.connectWallet = async function () {
+
+  if (!window.ethereum) {
+    alert("Install MetaMask");
+    return;
+  }
+
+  await window.ethereum.request({
+    method: "eth_requestAccounts"
+  });
+
+  provider = new ethers.BrowserProvider(window.ethereum);
+
+  signer = await provider.getSigner();
+
+  contract = new ethers.Contract(
+    contractAddress,
+    contractABI,
+    signer
+  );
+
+  alert("Wallet Connected");
+};
+
+window.getNumber = async function () {
+
+  if (!contract) {
+    alert("Connect wallet first");
+    return;
+  }
+
+  const number = await contract.number();
+
+  alert("Stored Number: " + number.toString());
+};
+
+
+
+
+HTML
+<!DOCTYPE html> 
+<html>
+<head> 
+<title>Web3 Test</title> 
+</head> 
+<body> 
+<button onclick="connectWallet()">Connect Wallet</button> 
+<button onclick="getNumber()">Get Number</button> 
+<script type="module" src="/index.js"></script> 
+</body> 
+</html> 
