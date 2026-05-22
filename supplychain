@@ -1,0 +1,133 @@
+<!DOCTYPE html> 
+<html lang="en"> 
+<head> 
+<meta charset="UTF-8"> 
+<meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+<title>Supply Chain DApp</title> 
+<style> 
+ body { 
+ font-family: Arial, sans-serif; 
+ background: #f4f4f4; 
+ text-align: center; 
+ margin: 0; 
+ padding: 0; 
+ } 
+ .container { 
+ width: 400px; 
+ margin: 40px auto; 
+ background: white; 
+ padding: 20px; 
+ border-radius: 10px; 
+ box-shadow: 0 0 10px gray; 
+ } 
+ h2 { 
+ color: #333; 
+ } 
+ input {
+width: 90%; 
+ padding: 10px; 
+ margin: 8px 0; 
+ border: 1px solid #ccc; 
+ border-radius: 5px; 
+ } 
+ button { 
+ padding: 10px 15px; 
+ margin: 5px; 
+ border: none; 
+ border-radius: 5px; 
+ background: #007bff; 
+ color: white; 
+ cursor: pointer; 
+ } 
+ button:hover { 
+ background: #0056b3; 
+ } 
+ #output { 
+ margin-top: 20px; 
+ background: #eee; 
+ padding: 10px; 
+ border-radius: 5px; 
+ white-space: pre-line; 
+ } 
+</style> 
+</head>
+<body> 
+<h2>Supply Chain DApp</h2> 
+<div class="container"> 
+ <h3>Create Product</h3> 
+ <input type="number" id="pid" placeholder="Product ID"> 
+ <input type="text" id="pname" placeholder="Product Name"> 
+ <button onclick="createProduct()">Create</button> 
+ <h3>Ship Product</h3> 
+ <input type="number" id="shipId" placeholder="Product ID"> 
+ <button onclick="shipProduct()">Ship</button> 
+ <h3>Deliver Product</h3> 
+ <input type="number" id="deliverId" placeholder="Product ID"> 
+ <button onclick="deliverProduct()">Deliver</button> 
+ <h3>Get Product Info</h3> 
+ <input type="number" id="getId" placeholder="Product ID"> 
+ <button onclick="getProduct()">Get Info</button> 
+ <p id="output"></p> 
+</div> 
+<script src="https://cdn.jsdelivr.net/npm/web3@1.8.2/dist/web3.min.js"></script> 
+<script>
+let web3; 
+let contract; 
+let account; 
+const abi = []; 
+const address = "0x1f695dfA14b967c8b9cB64a620198aF18CA8706A"; 
+window.onload = async () => { 
+ if (window.ethereum) { 
+ web3 = new Web3(window.ethereum); 
+ await window.ethereum.request({ 
+ method: 'eth_requestAccounts' 
+ }); 
+ const accounts = await web3.eth.getAccounts(); 
+ account = accounts[0]; 
+ contract = new web3.eth.Contract(abi, address); 
+ console.log("Connected Account:", account); 
+ } else { 
+ alert("Please Install MetaMask"); 
+ } 
+};
+async function createProduct() { 
+ const id = document.getElementById("pid").value; 
+ const name = document.getElementById("pname").value; 
+ await contract.methods 
+ .createProduct(id, name) 
+ .send({ from: account }); 
+ alert("Product Created Successfully"); 
+} 
+async function shipProduct() { 
+ const id = document.getElementById("shipId").value; 
+ await contract.methods 
+ .shipProduct(id) 
+ .send({ from: account }); 
+ alert("Product Shipped Successfully"); 
+} 
+async function deliverProduct() { 
+ const id = document.getElementById("deliverId").value; 
+ await contract.methods 
+ .deliverProduct(id) 
+ .send({ from: account });
+ alert("Product Delivered Successfully"); 
+} 
+async function getProduct() { 
+ const id = document.getElementById("getId").value; 
+ const product = await contract.methods 
+ .getProduct(id) 
+ .call(); 
+ const stateMap = [ 
+ "Created", 
+ "Shipped", 
+ "Delivered" 
+ ]; 
+ document.getElementById("output").innerText = 
+ "Product ID: " + product[0] + 
+ "\nProduct Name: " + product[1] + 
+ "\nManufacturer: " + product[2] + 
+ "\nStatus: " + stateMap[product[3]]; 
+} 
+</script> 
+</body> 
+</html>
