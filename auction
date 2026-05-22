@@ -1,0 +1,51 @@
+<!DOCTYPE html> 
+<html> 
+<head> 
+ <title>Auction DApp</title> 
+</head> 
+<body> 
+<h2>Auction DApp</h2> 
+<input type="number" id="amount" placeholder="Enter Bid"> 
+<button onclick="bid()">Place Bid</button> 
+<button onclick="showBid()">Show Highest Bid</button> 
+<p id="result"></p> 
+<script src="https://cdn.jsdelivr.net/npm/web3@1.8.2/dist/web3.min.js"></script> 
+<script> 
+let web3; 
+let contract; 
+let user; 
+// ABI 
+const abi = [PASTE_ABI]; 
+// Contract Address 
+const address = "PASTE_CONTRACT_ADDRESS"; 
+// Connect MetaMask 
+async function connect() { 
+ web3 = new Web3(window.ethereum); 
+ await window.ethereum.request({ 
+ method: "eth_requestAccounts" 
+ }); 
+ let accounts = await web3.eth.getAccounts(); 
+ user = accounts[0];
+contract = new web3.eth.Contract(abi, address); 
+ console.log("Connected:", user); 
+} 
+connect(); 
+// Place Bid 
+async function bid() { 
+ let amount = document.getElementById("amount").value; 
+ await contract.methods.bid().send({ 
+ from: user, 
+ value: amount 
+ }); 
+ alert("Bid Successful"); 
+} 
+// Show Highest Bid 
+async function showBid() { 
+ let highestBid = 
+ await contract.methods.highestBid().call(); 
+ document.getElementById("result").innerText = 
+ "Highest Bid = " + highestBid; 
+} 
+</script> 
+</body> 
+</html>
